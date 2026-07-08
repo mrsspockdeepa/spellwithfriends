@@ -91,6 +91,31 @@
   }
   .invite code{font-family:'Bricolage Grotesque'; font-weight:800; font-size:20px; letter-spacing:.2em; color:var(--coral-deep);}
 
+  /* collapsibles */
+  .collapse{border:2px solid #EDF2F2; border-radius:16px; margin-top:12px; overflow:hidden; background:#fff;}
+  .collapse-head{width:100%; display:flex; align-items:center; gap:8px; padding:13px 14px; background:#fff; border:none; cursor:pointer; font-family:inherit;}
+  .collapse-head .lab{font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--turq-deep);}
+  .collapse-head .cur{margin-left:auto; font-size:13px; font-weight:700; color:var(--coral-deep); background:var(--coral-soft); padding:4px 10px; border-radius:999px;}
+  .collapse-head .chev{transition:transform .2s; color:var(--muted); font-size:13px;}
+  .collapse.open .chev{transform:rotate(180deg);}
+  .collapse-body{max-height:0; overflow:hidden; transition:max-height .25s ease, padding .25s ease; padding:0 14px;}
+  .collapse.open .collapse-body{max-height:320px; padding:2px 14px 14px; overflow:auto;}
+
+  /* presence + invites */
+  .pdot{width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:4px; vertical-align:1px;}
+  .pdot.on{background:#2FBF71;} .pdot.off{background:#C3CDD0;}
+  .player.off{background:#F4F7F7; color:var(--muted); cursor:pointer; transition:background .15s;}
+  .player.off:hover{background:#EAF1F1;}
+  .player.off .avatar{background:#C3CDD0;}
+  .player .status{margin-left:auto; font-size:12px; font-weight:700;}
+  .player .status.on{color:var(--turq-deep);} .player .status.off{color:var(--muted);}
+  .toast{position:absolute; left:50%; bottom:22px; transform:translateX(-50%); background:var(--ink); color:#fff; font-size:13px; font-weight:600; padding:10px 18px; border-radius:999px; opacity:0; transition:opacity .25s; pointer-events:none; white-space:nowrap; z-index:5; max-width:92%;}
+  .toast.show{opacity:1;}
+  .dotlogo{display:block; margin:0 auto;}
+  .wl{width:26px; height:26px; border-radius:9px; display:grid; place-items:center; font-family:'Bricolage Grotesque'; font-weight:800; font-size:13px; color:#fff; flex-shrink:0;}
+  .wl.w{background:var(--turq);} .wl.l{background:var(--coral);}
+  .histmeta{font-size:12px; color:var(--muted); font-weight:500;}
+
   /* game */
   .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
   .roundpill{background:var(--coral-soft); color:var(--coral-deep); font-weight:700; font-size:13px; padding:6px 12px; border-radius:999px;}
@@ -138,13 +163,32 @@
 </head>
 <body>
 <div class="phone">
-  <div class="statusbar"><span>9:41</span><span>🐝 SpellWithFriends</span><span>▮▮▮</span></div>
+  <div class="statusbar"><span></span><span>🐝 SpellWithFriends</span><span>▮▮▮</span></div>
 
   <!-- SIGN UP -->
   <section class="screen active" id="s-signup">
-    <div class="bee">🐝</div>
+    <svg class="dotlogo" width="160" height="104" viewBox="0 0 150 100" role="img" aria-label="SpellWithFriends dot-art bee logo">
+      <path d="M10 92 Q 42 98 56 76" fill="none" stroke="#17BEBB" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 9"/>
+      <g fill="#17BEBB">
+        <circle cx="70" cy="20" r="5"/><circle cx="82" cy="14" r="6"/><circle cx="94" cy="19" r="5"/>
+        <circle cx="76" cy="30" r="4"/><circle cx="88" cy="28" r="4"/>
+        <circle cx="104" cy="12" r="3.5" opacity=".65"/><circle cx="62" cy="12" r="3" opacity=".65"/>
+      </g>
+      <circle cx="52" cy="56" r="8" fill="#FF6B5E"/>
+      <circle cx="46" cy="46" r="3" fill="#FF6B5E"/><circle cx="58" cy="44" r="3" fill="#FF6B5E"/>
+      <circle cx="55" cy="54" r="1.8" fill="#fff"/>
+      <g fill="#22343B"><circle cx="66" cy="50" r="4.5"/><circle cx="66" cy="61" r="4.5"/><circle cx="67" cy="72" r="3.5"/></g>
+      <g fill="#FF6B5E"><circle cx="78" cy="48" r="5"/><circle cx="78" cy="60" r="5"/><circle cx="79" cy="72" r="4"/></g>
+      <g fill="#22343B"><circle cx="90" cy="50" r="4.5"/><circle cx="90" cy="61" r="4.5"/><circle cx="91" cy="71" r="3.5"/></g>
+      <g fill="#FF6B5E"><circle cx="101" cy="53" r="4"/><circle cx="101" cy="63" r="4"/></g>
+      <g fill="#22343B"><circle cx="110" cy="56" r="3"/><circle cx="111" cy="64" r="2.5"/><circle cx="118" cy="60" r="2"/></g>
+      <path d="M48 48 Q 44 38 38 34" fill="none" stroke="#22343B" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="38" cy="34" r="3" fill="#17BEBB"/>
+      <path d="M56 46 Q 56 36 62 31" fill="none" stroke="#22343B" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="62" cy="31" r="3" fill="#FF6B5E"/>
+    </svg>
     <div class="logo" style="text-align:center;">Spell<span class="w">With</span><span class="f">Friends</span></div>
-    <p class="tag" style="text-align:center;">Same word. Same moment. May the best speller win.</p>
+    <p class="tag" style="text-align:center;">A social app for spellers.</p>
     <h2>Create your account</h2>
     <p class="sub">Three fields and you're in the hive.</p>
     <label for="f-name">Name</label>
@@ -156,24 +200,67 @@
     <input type="password" id="f-pass" placeholder="8+ characters, letters & numbers">
     <div class="hint" id="pass-hint">Minimum 8 characters with at least one letter and one number.</div>
     <button class="btn" id="btn-signup">Sign up & play</button>
-    <p class="hint" style="text-align:center; margin-top:12px;">Already buzzing? <a href="#" style="color:var(--turq-deep); font-weight:700;">Log in</a></p>
+    <p class="hint" style="text-align:center; margin-top:12px;">Already buzzing? <a href="#" id="link-login" style="color:var(--turq-deep); font-weight:700;">Log in</a></p>
+  </section>
+
+  <!-- LOG IN -->
+  <section class="screen" id="s-login">
+    <div class="logo" style="text-align:center; margin-top:10px;">Spell<span class="w">With</span><span class="f">Friends</span></div>
+    <h2>Welcome back</h2>
+    <p class="sub">Log in to rejoin the hive.</p>
+    <label for="f-lemail">Email</label>
+    <input type="email" id="f-lemail" placeholder="you@example.com" autocomplete="email">
+    <div class="hint" id="lemail-hint"></div>
+    <label for="f-lpass">Password</label>
+    <input type="password" id="f-lpass" placeholder="your password" autocomplete="current-password">
+    <button class="btn turq" id="btn-login">Log in</button>
+    <p class="hint" style="text-align:center; margin-top:14px;">
+      <a href="#" id="link-forgot" style="color:var(--coral-deep); font-weight:700;">Forgot password?</a>
+      &nbsp;·&nbsp;
+      <a href="#" id="link-signup" style="color:var(--turq-deep); font-weight:700;">Sign up</a>
+    </p>
+  </section>
+
+  <!-- FORGOT PASSWORD -->
+  <section class="screen" id="s-forgot">
+    <div class="logo" style="text-align:center; margin-top:10px;">Spell<span class="w">With</span><span class="f">Friends</span></div>
+    <h2>Reset your password</h2>
+    <p class="sub">Enter your email and we'll send a reset link. Links expire after 30 minutes.</p>
+    <label for="f-remail">Email</label>
+    <input type="email" id="f-remail" placeholder="you@example.com" autocomplete="email">
+    <div class="hint" id="remail-hint"></div>
+    <button class="btn" id="btn-reset">Send reset link</button>
+    <div class="hint" id="reset-msg" style="text-align:center; margin-top:14px; font-size:14px;"></div>
+    <p class="hint" style="text-align:center; margin-top:10px;"><a href="#" id="link-backlogin" style="color:var(--turq-deep); font-weight:700;">Back to log in</a></p>
   </section>
 
   <!-- LOBBY -->
   <section class="screen" id="s-lobby">
-    <div class="logo" style="font-size:20px;">Spell<span class="w">With</span><span class="f">Friends</span></div>
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div class="logo" style="font-size:20px;">Spell<span class="w">With</span><span class="f">Friends</span></div>
+      <button class="hintbtn" id="btn-logout" style="color:var(--coral-deep); border-color:var(--coral-soft);">Log out</button>
+    </div>
     <h2 id="lobby-hello">New match</h2>
     <p class="sub">You're the host. Pick a level and category, then wait for the swarm.</p>
 
-    <div class="section-label">Level</div>
-    <div class="chips" id="levels"></div>
+    <div class="collapse" id="col-level">
+      <button class="collapse-head" onclick="toggleCol('col-level')" aria-expanded="false"><span class="lab">Level</span><span class="cur" id="cur-level">Grade 4</span><span class="chev">▾</span></button>
+      <div class="collapse-body"><div class="chips" id="levels"></div></div>
+    </div>
 
-    <div class="section-label">Category</div>
-    <div class="chips" id="cats"></div>
+    <div class="collapse" id="col-cat">
+      <button class="collapse-head" onclick="toggleCol('col-cat')" aria-expanded="false"><span class="lab">Category</span><span class="cur" id="cur-cat">All Categories</span><span class="chev">▾</span></button>
+      <div class="collapse-body"><div class="chips" id="cats"></div></div>
+    </div>
 
-    <div class="section-label">Players (2–10)</div>
+    <div class="section-label">Players (2–10) · tap an offline friend to invite</div>
     <div class="players" id="playerlist"></div>
     <div class="invite"><span>Invite code</span><code>BUZZ42</code><button class="hintbtn" onclick="fakeCopy(this)">Copy</button></div>
+
+    <div class="collapse" id="col-hist">
+      <button class="collapse-head" onclick="toggleCol('col-hist')" aria-expanded="false"><span class="lab">Match history</span><span class="cur" id="cur-hist">0W · 0L</span><span class="chev">▾</span></button>
+      <div class="collapse-body"><div class="scorelist" id="histlist"></div></div>
+    </div>
 
     <button class="btn turq" id="btn-start" disabled>Waiting for players…</button>
   </section>
@@ -223,6 +310,8 @@
     <button class="btn" id="btn-rematch">Rematch 🔁</button>
     <button class="btn ghost" id="btn-newmatch">New match settings</button>
   </section>
+
+  <div class="toast" id="toast" role="status"></div>
 </div>
 
 <script>
@@ -271,11 +360,15 @@ function poolFor(level){
   if(gi<=3) return BANK.low; if(gi<=7) return BANK.mid;
   if(gi<=12) return BANK.high; if(gi<=14) return BANK.expert; return BANK.champ;
 }
-const BOTS = [{n:'Krystal',a:'K'},{n:'Uche',a:'U'},{n:'Mara',a:'M'}];
+const FRIENDS = [
+  {n:'Krystal', a:'K', online:true,  joined:false, invited:false},
+  {n:'Mara',    a:'M', online:true,  joined:false, invited:false},
+  {n:'Uche',    a:'U', online:false, joined:false, invited:false}
+];
 const ROUNDS = 5, TIME = 25;
 
 /* ------- state ------- */
-let state = {name:'Jen', level:'Grade 4', cat:'All Categories', round:0, words:[], scores:{}, timer:null, timeLeft:TIME, botAcc:.6, submitted:false};
+let state = {name:'Jen', level:'Grade 4', cat:'All Categories', round:0, words:[], scores:{}, timer:null, timeLeft:TIME, botAcc:.6, submitted:false, opponents:[]};
 
 /* ------- helpers ------- */
 const $ = id=>document.getElementById(id);
@@ -288,51 +381,141 @@ function speak(word){
 function fakeCopy(btn){btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1200);}
 
 /* ------- signup ------- */
+const emailOkRe=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+let account=null; // {name,email} set at signup, used by login + reset flows
 $('f-email').addEventListener('input',e=>{
-  const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value);
+  const ok=emailOkRe.test(e.target.value);
   $('email-hint').textContent = e.target.value ? (ok?'✓ Looks good':'Enter a valid email') : '';
   $('email-hint').className = 'hint'+(ok?'':' err');
 });
 $('btn-signup').addEventListener('click',()=>{
   const name=$('f-name').value.trim()||'Player';
   const email=$('f-email').value.trim(); const pass=$('f-pass').value;
-  const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const passOk=pass.length>=8 && /[a-zA-Z]/.test(pass) && /\d/.test(pass);
-  if(!emailOk){$('email-hint').textContent='Enter a valid email'; $('email-hint').className='hint err'; return;}
-  if(!passOk){$('pass-hint').textContent='Password needs 8+ characters with at least one letter and one number.'; $('pass-hint').className='hint err'; return;}
+  if(!emailOkRe.test(email)){$('email-hint').textContent='Enter a valid email address (like you@example.com)'; $('email-hint').className='hint err'; $('f-email').focus(); return;}
+  if(!passOk){$('pass-hint').textContent='Password needs 8+ characters with at least one letter and one number.'; $('pass-hint').className='hint err'; $('f-pass').focus(); return;}
+  account={name,email};
   state.name=name; $('lobby-hello').textContent=`New match, hosted by ${name}`;
   buildLobby(); show('s-lobby');
 });
 
+/* ------- login / forgot password / logout ------- */
+$('link-login').addEventListener('click',e=>{e.preventDefault(); show('s-login');});
+$('link-signup').addEventListener('click',e=>{e.preventDefault(); show('s-signup');});
+$('link-forgot').addEventListener('click',e=>{e.preventDefault(); $('reset-msg').textContent=''; show('s-forgot');});
+$('link-backlogin').addEventListener('click',e=>{e.preventDefault(); show('s-login');});
+$('btn-login').addEventListener('click',()=>{
+  const email=$('f-lemail').value.trim(); const pass=$('f-lpass').value;
+  if(!emailOkRe.test(email)){$('lemail-hint').textContent='Enter a valid email address'; $('lemail-hint').className='hint err'; return;}
+  if(!pass){$('lemail-hint').textContent='Enter your password'; $('lemail-hint').className='hint err'; return;}
+  if(account && account.email.toLowerCase()!==email.toLowerCase()){
+    $('lemail-hint').textContent='No account found for that email — check the spelling or sign up.';
+    $('lemail-hint').className='hint err'; return;
+  }
+  $('lemail-hint').textContent='';
+  const name=account?account.name:email.split('@')[0].replace(/^./,c=>c.toUpperCase());
+  account=account||{name,email};
+  state.name=name; $('lobby-hello').textContent=`New match, hosted by ${name}`;
+  toast(`Welcome back, ${name}!`);
+  buildLobby(); show('s-lobby');
+});
+$('btn-reset').addEventListener('click',()=>{
+  const email=$('f-remail').value.trim();
+  if(!emailOkRe.test(email)){$('remail-hint').textContent='Enter a valid email address'; $('remail-hint').className='hint err'; return;}
+  $('remail-hint').textContent='';
+  $('reset-msg').innerHTML='📬 If that email is registered, a reset link is on its way.<br>Check your inbox — the link expires in 30 minutes.';
+  toast('Reset link sent');
+});
+$('btn-logout').addEventListener('click',()=>{
+  clearInterval(state.timer);
+  FRIENDS.forEach(f=>{f.joined=false; f.invited=false; if(f.n==='Uche')f.online=false;});
+  ['f-lemail','f-lpass','f-pass'].forEach(id=>$(id).value='');
+  toast('Logged out — see you at the next bee 🐝');
+  show('s-login');
+});
+
 /* ------- lobby ------- */
+const HISTORY = [
+  {r:'W', lvl:'Grade 4', opp:'Krystal +1', pts:520},
+  {r:'L', lvl:'Medium',  opp:'Mara',       pts:305},
+  {r:'W', lvl:'Grade 6', opp:'Uche +2',    pts:465}
+];
+function renderHistory(){
+  const w=HISTORY.filter(h=>h.r==='W').length, l=HISTORY.length-w;
+  $('cur-hist').textContent=`${w}W · ${l}L`;
+  $('histlist').innerHTML = HISTORY.length
+    ? [...HISTORY].reverse().map(h=>
+      `<div class="scorerow"><span class="wl ${h.r.toLowerCase()}">${h.r}</span><span>vs ${h.opp}</span><span class="histmeta">${h.lvl}</span><span class="pts" style="margin-left:auto;">${h.pts}</span></div>`).join('')
+    : '<div class="histmeta" style="padding:6px 2px;">No matches yet — start one and make history.</div>';
+}
+function toggleCol(id){
+  const c=$(id); c.classList.toggle('open');
+  c.querySelector('.collapse-head').setAttribute('aria-expanded', c.classList.contains('open'));
+}
 function buildLobby(){
   $('levels').innerHTML=''; $('cats').innerHTML='';
   LEVELS.forEach(l=>{
     const b=document.createElement('button'); b.className='chip'+(l===state.level?' sel':''); b.textContent=l;
-    b.onclick=()=>{state.level=l; [...$('levels').children].forEach(c=>c.classList.remove('sel')); b.classList.add('sel');};
+    b.onclick=()=>{state.level=l; [...$('levels').children].forEach(c=>c.classList.remove('sel')); b.classList.add('sel');
+      $('cur-level').textContent=l; $('col-level').classList.remove('open');};
     $('levels').appendChild(b);
   });
   CATS.forEach(c=>{
     const b=document.createElement('button'); b.className='chip coralsel'+(c===state.cat?' sel':''); b.textContent=c;
-    b.onclick=()=>{state.cat=c; [...$('cats').children].forEach(x=>x.classList.remove('sel')); b.classList.add('sel');};
+    b.onclick=()=>{state.cat=c; [...$('cats').children].forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
+      $('cur-cat').textContent=c; $('col-cat').classList.remove('open');};
     $('cats').appendChild(b);
   });
-  const pl=$('playerlist'); pl.innerHTML='';
-  addPlayer(state.name,state.name[0].toUpperCase(),true);
-  BOTS.forEach((b,i)=>setTimeout(()=>{ addPlayer(b.n,b.a,false);
-    if(i===BOTS.length-1){$('btn-start').disabled=false; $('btn-start').textContent='Everyone\'s ready — Start match';}
-  }, 900*(i+1)));
+  renderPlayers();
+  renderHistory();
+  FRIENDS.filter(f=>f.online && !f.joined).forEach((f,i)=>
+    setTimeout(()=>{f.joined=true; renderPlayers(); toast(`${f.n} joined the hive`);}, 1000*(i+1)));
 }
-function addPlayer(n,a,you){
-  const d=document.createElement('div'); d.className='player'+(you?' you':'');
-  d.innerHTML=`<span class="avatar">${a}</span>${n}${you?' (you)':''}<span class="ready">✓ Ready</span>`;
-  $('playerlist').appendChild(d);
+function renderPlayers(){
+  const pl=$('playerlist'); pl.innerHTML='';
+  const me=document.createElement('div'); me.className='player you';
+  me.innerHTML=`<span class="avatar">${state.name[0].toUpperCase()}</span>${state.name} (you)<span class="status on"><span class="pdot on"></span>Online · Host</span>`;
+  pl.appendChild(me);
+  FRIENDS.forEach(f=>{
+    const d=document.createElement('div');
+    if(f.joined){
+      d.className='player';
+      d.innerHTML=`<span class="avatar">${f.a}</span>${f.n}<span class="status on"><span class="pdot on"></span>Online · Ready</span>`;
+    } else if(f.online){
+      d.className='player';
+      d.innerHTML=`<span class="avatar">${f.a}</span>${f.n}<span class="status on"><span class="pdot on"></span>Online · joining…</span>`;
+    } else {
+      d.className='player off'; d.setAttribute('role','button'); d.tabIndex=0;
+      d.setAttribute('aria-label',`${f.n} is offline. Activate to send a game invite.`);
+      d.innerHTML=`<span class="avatar">${f.a}</span>${f.n}<span class="status off"><span class="pdot off"></span>${f.invited?'Invite sent ✓':'Offline · tap to invite'}</span>`;
+      const act=()=>invite(f); d.onclick=act;
+      d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault(); act();}};
+    }
+    pl.appendChild(d);
+  });
+  updateStart();
+}
+function invite(f){
+  if(f.invited) return;
+  f.invited=true; renderPlayers();
+  toast(`Invite sent to ${f.n} 🐝 — they're signed up, so they'll get a push`);
+  setTimeout(()=>{ f.online=true; f.joined=true; renderPlayers(); toast(`${f.n} accepted your invite and joined!`); }, 4200);
+}
+function toast(msg){
+  const t=$('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2500);
+}
+function updateStart(){
+  const joined=FRIENDS.filter(f=>f.joined).length;
+  $('btn-start').disabled = joined<1;
+  $('btn-start').textContent = joined>=1 ? `Start match (${joined+1} players)` : 'Waiting for players…';
 }
 $('btn-start').addEventListener('click',()=>{
   const gi=LEVELS.indexOf(state.level);
   state.botAcc = gi<=7 ? .8 : gi<=12 ? .6 : gi<=14 ? .45 : .3;
+  state.opponents=FRIENDS.filter(f=>f.joined);
   state.words=[...poolFor(state.level)].sort(()=>Math.random()-.5).slice(0,ROUNDS);
-  state.scores={}; [state.name,...BOTS.map(b=>b.n)].forEach(n=>state.scores[n]=0);
+  state.scores={}; [state.name,...state.opponents.map(b=>b.n)].forEach(n=>state.scores[n]=0);
   state.round=0; startRound();
 });
 
@@ -349,7 +532,7 @@ function startRound(){
   setTimeout(()=>speak(w.w),400);
   clearInterval(state.timer);
   state.timer=setInterval(tick,1000); drawRing();
-  BOTS.forEach(b=>{ const t=3000+Math.random()*(TIME-8)*1000;
+  state.opponents.forEach(b=>{ const t=3000+Math.random()*(TIME-8)*1000;
     setTimeout(()=>{ if(state.round<ROUNDS && !state.botDone[b.n]){state.botDone[b.n]={t:TIME-state.timeLeft, ok:Math.random()<state.botAcc}; renderOpps();}},t);
   });
 }
@@ -364,7 +547,7 @@ function drawRing(){
   $('ringfg').style.stroke = frac<.25 ? 'var(--coral)' : 'var(--turq)';
 }
 function renderOpps(){
-  $('opp-status').innerHTML=BOTS.map(b=>`<span class="opp ${state.botDone&&state.botDone[b.n]?'done':''}">${b.n} ${state.botDone&&state.botDone[b.n]?'✓ submitted':'…spelling'}</span>`).join('');
+  $('opp-status').innerHTML=state.opponents.map(b=>`<span class="opp ${state.botDone&&state.botDone[b.n]?'done':''}">${b.n} ${state.botDone&&state.botDone[b.n]?'✓ submitted':'…spelling'}</span>`).join('');
 }
 $('f-spell').addEventListener('input',e=>{
   $('tiles').innerHTML=[...e.target.value.trim()].map(ch=>`<span class="tile">${ch}</span>`).join('');
@@ -385,7 +568,7 @@ function resolveRound(answer, myTime){
   const w=state.words[state.round];
   const meOk = answer!==null && answer.toLowerCase()===w.w.toLowerCase();
   const results=[{n:state.name, ok:meOk, t:myTime, sub:answer===null?'(no answer)':answer}];
-  BOTS.forEach(b=>{ const d=state.botDone[b.n]||{t:TIME,ok:false};
+  state.opponents.forEach(b=>{ const d=state.botDone[b.n]||{t:TIME,ok:false};
     results.push({n:b.n, ok:d.ok, t:d.t, sub:d.ok?w.w:scramble(w.w)});
   });
   const correct=results.filter(r=>r.ok);
@@ -411,6 +594,10 @@ $('btn-next').addEventListener('click',()=>{
 function showResults(){
   const rows=Object.entries(state.scores).sort((a,b)=>b[1]-a[1]);
   const winner=rows[0][0];
+  const oppCount=state.opponents.length;
+  const topOpp=rows.find(([n])=>n!==state.name)[0];
+  HISTORY.push({r:winner===state.name?'W':'L', lvl:state.level, opp:topOpp+(oppCount>1?` +${oppCount-1}`:''), pts:state.scores[state.name]});
+  renderHistory();
   $('final-title').textContent = winner===state.name ? `You win, ${state.name}!` : `${winner} takes the hive!`;
   $('final-sub').textContent = `${state.level} · ${state.cat} · ${ROUNDS} rounds`;
   $('final-scores').innerHTML = rows.map(([n,p],i)=>
