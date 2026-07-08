@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpellWithFriends — Interactive Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --coral:#FF6B5E; --coral-deep:#E44D3F; --coral-soft:#FFE3DE;
+    --turq:#17BEBB; --turq-deep:#0E9B94; --turq-soft:#DDF6F5;
+    --ink:#22343B; --muted:#6B7F86; --cream:#FDFAF5; --card:#FFFFFF;
+    --radius:20px; --shadow:0 10px 30px rgba(34,52,59,.10);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Outfit',system-ui,sans-serif; color:var(--ink);
+    background:
+      radial-gradient(600px 400px at 85% -10%, var(--turq-soft), transparent 70%),
+      radial-gradient(700px 500px at -10% 100%, var(--coral-soft), transparent 70%),
+      var(--cream);
+    display:flex; align-items:flex-start; justify-content:center; padding:24px 12px;
+    min-height:100%;
+  }
+  .phone{
+    width:min(420px,100%); background:var(--card); border-radius:34px;
+    box-shadow:var(--shadow), 0 0 0 1px rgba(34,52,59,.06);
+    overflow:hidden; position:relative; min-height:760px; display:flex; flex-direction:column;
+  }
+  .statusbar{display:flex; justify-content:space-between; padding:14px 24px 0; font-size:12px; font-weight:600; color:var(--muted);}
+  .screen{display:none; flex:1; flex-direction:column; padding:20px 24px 28px;}
+  .screen.active{display:flex; animation:fadeUp .35s ease both;}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(10px);}to{opacity:1; transform:none;}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important;}}
+
+  .logo{font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:28px; letter-spacing:-.5px;}
+  .logo .w{color:var(--turq-deep);} .logo .f{color:var(--coral);}
+  .tag{color:var(--muted); font-size:14px; margin-top:4px;}
+
+  h2{font-family:'Bricolage Grotesque',sans-serif; font-weight:700; font-size:22px; margin:18px 0 4px;}
+  .sub{color:var(--muted); font-size:14px; margin-bottom:14px;}
+
+  label{font-size:13px; font-weight:600; display:block; margin:14px 0 6px;}
+  input[type=text],input[type=email],input[type=password]{
+    width:100%; padding:14px 16px; font-size:16px; font-family:inherit;
+    border:2px solid #E5EAEB; border-radius:14px; background:#FBFDFD; outline:none;
+    transition:border-color .15s;
+  }
+  input:focus{border-color:var(--turq);}
+  .hint{font-size:12px; color:var(--muted); margin-top:5px;}
+  .hint.err{color:var(--coral-deep);}
+
+  .btn{
+    width:100%; padding:16px; border:none; border-radius:16px; cursor:pointer;
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:700; font-size:17px;
+    background:var(--coral); color:#fff; margin-top:18px;
+    box-shadow:0 6px 0 var(--coral-deep); transition:transform .08s, box-shadow .08s;
+  }
+  .btn:active{transform:translateY(4px); box-shadow:0 2px 0 var(--coral-deep);}
+  .btn.turq{background:var(--turq); box-shadow:0 6px 0 var(--turq-deep);}
+  .btn.turq:active{box-shadow:0 2px 0 var(--turq-deep);}
+  .btn.ghost{background:transparent; color:var(--turq-deep); box-shadow:none; border:2px solid var(--turq); font-size:15px; padding:12px;}
+  .btn:disabled{opacity:.45; cursor:not-allowed; box-shadow:none; transform:none;}
+  .btn:focus-visible,input:focus-visible,.chip:focus-visible{outline:3px solid var(--turq); outline-offset:2px;}
+
+  .bee{font-size:44px; text-align:center; margin:8px 0 2px;}
+
+  /* lobby */
+  .chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    padding:9px 13px; border-radius:999px; border:2px solid #E5EAEB; background:#fff;
+    font-family:inherit; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer; transition:all .12s;
+  }
+  .chip:hover{border-color:var(--turq);}
+  .chip.sel{background:var(--turq); border-color:var(--turq); color:#fff;}
+  .chip.coralsel.sel{background:var(--coral); border-color:var(--coral);}
+  .section-label{font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--turq-deep); margin:18px 0 8px;}
+  .players{display:flex; flex-direction:column; gap:8px; margin-top:4px;}
+  .player{
+    display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:14px;
+    background:var(--turq-soft); font-size:14px; font-weight:600; animation:fadeUp .3s ease both;
+  }
+  .player .avatar{width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:var(--turq); color:#fff; font-weight:700; font-size:14px;}
+  .player.you .avatar{background:var(--coral);} .player.you{background:var(--coral-soft);}
+  .player .ready{margin-left:auto; font-size:12px; color:var(--turq-deep); font-weight:700;}
+  .invite{
+    margin-top:14px; padding:12px 14px; border:2px dashed var(--coral); border-radius:14px;
+    display:flex; justify-content:space-between; align-items:center; font-size:14px;
+  }
+  .invite code{font-family:'Bricolage Grotesque'; font-weight:800; font-size:20px; letter-spacing:.2em; color:var(--coral-deep);}
+
+  /* game */
+  .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+  .roundpill{background:var(--coral-soft); color:var(--coral-deep); font-weight:700; font-size:13px; padding:6px 12px; border-radius:999px;}
+  .lvlpill{background:var(--turq-soft); color:var(--turq-deep); font-weight:700; font-size:13px; padding:6px 12px; border-radius:999px;}
+  .timerwrap{display:grid; place-items:center; margin:14px 0 6px;}
+  .ring{position:relative; width:110px; height:110px;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring .num{position:absolute; inset:0; display:grid; place-items:center; font-family:'Bricolage Grotesque'; font-weight:800; font-size:30px;}
+  .speak{
+    margin:10px auto 0; display:flex; align-items:center; gap:8px; padding:12px 20px;
+    border-radius:999px; border:none; cursor:pointer; background:var(--turq); color:#fff;
+    font-family:inherit; font-weight:700; font-size:15px; box-shadow:0 5px 0 var(--turq-deep);
+  }
+  .speak:active{transform:translateY(3px); box-shadow:0 2px 0 var(--turq-deep);}
+  .hints{display:flex; gap:8px; justify-content:center; margin-top:10px;}
+  .hintbtn{background:#fff; border:2px solid #E5EAEB; border-radius:999px; padding:8px 14px; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;}
+  .hintbtn:hover{border-color:var(--coral);}
+  .hinttext{min-height:40px; text-align:center; font-size:14px; color:var(--muted); margin-top:10px; padding:0 6px; font-style:italic;}
+  .tiles{display:flex; gap:5px; justify-content:center; flex-wrap:wrap; margin:12px 0 4px; min-height:46px;}
+  .tile{
+    width:34px; height:42px; border-radius:9px; background:var(--coral-soft); color:var(--coral-deep);
+    display:grid; place-items:center; font-family:'Bricolage Grotesque'; font-weight:800; font-size:20px;
+    text-transform:uppercase; animation:pop .15s ease both;
+  }
+  @keyframes pop{from{transform:scale(.5); opacity:0;}to{transform:scale(1); opacity:1;}}
+  .opps{display:flex; gap:8px; justify-content:center; margin-top:12px; flex-wrap:wrap;}
+  .opp{font-size:12px; font-weight:600; color:var(--muted); background:#F2F6F6; padding:6px 12px; border-radius:999px;}
+  .opp.done{background:var(--turq-soft); color:var(--turq-deep);}
+
+  /* reveal + results */
+  .bigword{font-family:'Bricolage Grotesque'; font-weight:800; font-size:34px; text-align:center; color:var(--turq-deep); margin:8px 0; letter-spacing:.03em;}
+  .verdict{text-align:center; font-weight:700; font-size:18px; margin-bottom:12px;}
+  .verdict.good{color:var(--turq-deep);} .verdict.bad{color:var(--coral-deep);}
+  .scorelist{display:flex; flex-direction:column; gap:8px; margin-top:8px;}
+  .scorerow{display:flex; align-items:center; gap:10px; background:#F7FAFA; border-radius:14px; padding:11px 14px; font-size:14px; font-weight:600;}
+  .scorerow .pts{margin-left:auto; font-family:'Bricolage Grotesque'; font-weight:800;}
+  .scorerow .delta{font-size:12px; color:var(--turq-deep); font-weight:700;}
+  .scorerow.me{background:var(--coral-soft);}
+  .scorerow.winner{background:var(--turq-soft); box-shadow:inset 0 0 0 2px var(--turq);}
+  .subm{font-size:12px; color:var(--muted); font-weight:500;}
+  .subm.wrong{color:var(--coral-deep); text-decoration:line-through;}
+  .trophy{font-size:52px; text-align:center;}
+  .confetti{text-align:center; font-size:22px; letter-spacing:6px;}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>9:41</span><span>🐝 SpellWithFriends</span><span>▮▮▮</span></div>
+
+  <!-- SIGN UP -->
+  <section class="screen active" id="s-signup">
+    <div class="bee">🐝</div>
+    <div class="logo" style="text-align:center;">Spell<span class="w">With</span><span class="f">Friends</span></div>
+    <p class="tag" style="text-align:center;">Same word. Same moment. May the best speller win.</p>
+    <h2>Create your account</h2>
+    <p class="sub">Three fields and you're in the hive.</p>
+    <label for="f-name">Name</label>
+    <input type="text" id="f-name" placeholder="Jen" autocomplete="name">
+    <label for="f-email">Email</label>
+    <input type="email" id="f-email" placeholder="you@example.com" autocomplete="email">
+    <div class="hint" id="email-hint"></div>
+    <label for="f-pass">Password</label>
+    <input type="password" id="f-pass" placeholder="8+ characters, letters & numbers">
+    <div class="hint" id="pass-hint">Minimum 8 characters with at least one letter and one number.</div>
+    <button class="btn" id="btn-signup">Sign up & play</button>
+    <p class="hint" style="text-align:center; margin-top:12px;">Already buzzing? <a href="#" style="color:var(--turq-deep); font-weight:700;">Log in</a></p>
+  </section>
+
+  <!-- LOBBY -->
+  <section class="screen" id="s-lobby">
+    <div class="logo" style="font-size:20px;">Spell<span class="w">With</span><span class="f">Friends</span></div>
+    <h2 id="lobby-hello">New match</h2>
+    <p class="sub">You're the host. Pick a level and category, then wait for the swarm.</p>
+
+    <div class="section-label">Level</div>
+    <div class="chips" id="levels"></div>
+
+    <div class="section-label">Category</div>
+    <div class="chips" id="cats"></div>
+
+    <div class="section-label">Players (2–10)</div>
+    <div class="players" id="playerlist"></div>
+    <div class="invite"><span>Invite code</span><code>BUZZ42</code><button class="hintbtn" onclick="fakeCopy(this)">Copy</button></div>
+
+    <button class="btn turq" id="btn-start" disabled>Waiting for players…</button>
+  </section>
+
+  <!-- GAME -->
+  <section class="screen" id="s-game">
+    <div class="topbar">
+      <span class="roundpill" id="round-pill">Round 1 of 5</span>
+      <span class="lvlpill" id="level-pill"></span>
+    </div>
+    <div class="timerwrap">
+      <div class="ring">
+        <svg width="110" height="110"><circle cx="55" cy="55" r="48" fill="none" stroke="#EDF2F2" stroke-width="9"/><circle id="ringfg" cx="55" cy="55" r="48" fill="none" stroke="var(--turq)" stroke-width="9" stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="0"/></svg>
+        <div class="num" id="timer-num">25</div>
+      </div>
+    </div>
+    <button class="speak" id="btn-speak">🔊 Hear the word</button>
+    <div class="hints">
+      <button class="hintbtn" id="btn-def">Definition</button>
+      <button class="hintbtn" id="btn-sent">Use in a sentence</button>
+    </div>
+    <div class="hinttext" id="hinttext">Tap the speaker, then spell what you hear.</div>
+    <div class="tiles" id="tiles"></div>
+    <input type="text" id="f-spell" placeholder="type your spelling…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="text-align:center;">
+    <button class="btn" id="btn-submit">Submit spelling</button>
+    <div class="opps" id="opp-status"></div>
+  </section>
+
+  <!-- REVEAL -->
+  <section class="screen" id="s-reveal">
+    <div class="topbar"><span class="roundpill" id="reveal-pill"></span><span class="lvlpill" id="reveal-lvl"></span></div>
+    <p class="sub" style="text-align:center; margin-top:16px;">The word was</p>
+    <div class="bigword" id="reveal-word"></div>
+    <div class="verdict" id="reveal-verdict"></div>
+    <div class="section-label">Scores</div>
+    <div class="scorelist" id="reveal-scores"></div>
+    <button class="btn turq" id="btn-next">Next word</button>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="s-results">
+    <div class="trophy">🏆</div>
+    <div class="confetti">🎉 🐝 🎉</div>
+    <h2 style="text-align:center;" id="final-title"></h2>
+    <p class="sub" style="text-align:center;" id="final-sub"></p>
+    <div class="scorelist" id="final-scores"></div>
+    <button class="btn" id="btn-rematch">Rematch 🔁</button>
+    <button class="btn ghost" id="btn-newmatch">New match settings</button>
+  </section>
+</div>
+
+<script>
+/* ------- data ------- */
+const LEVELS = [...Array.from({length:12},(_,i)=>`Grade ${i+1}`),'Basic','Medium','Difficult','Champion'];
+const CATS = ['All Categories','Animals & Nature','Science','Geography','Food','Everyday Words'];
+const BANK = {
+  low:[ // Grades 1-4
+    {w:'apple',d:'A round fruit with red, green, or yellow skin.',s:'She packed an apple in her lunchbox.'},
+    {w:'smile',d:'A happy expression made with the mouth.',s:'The baby gave a big smile.'},
+    {w:'planet',d:'A large body that orbits a star.',s:'Earth is our home planet.'},
+    {w:'garden',d:'A place where plants and flowers grow.',s:'We planted tomatoes in the garden.'},
+    {w:'window',d:'An opening in a wall with glass.',s:'Sunlight came through the window.'}
+  ],
+  mid:[ // Grades 5-8
+    {w:'necessary',d:'Required; needed to be done.',s:'Water is necessary for life.'},
+    {w:'rhythm',d:'A repeated pattern of sound or movement.',s:'The drummer kept a steady rhythm.'},
+    {w:'peninsula',d:'Land surrounded by water on three sides.',s:'Florida is a peninsula.'},
+    {w:'broccoli',d:'A green vegetable with a dense flowering head.',s:'She steamed broccoli for dinner.'},
+    {w:'chameleon',d:'A lizard that can change color.',s:'The chameleon blended into the leaves.'}
+  ],
+  high:[ // Grades 9-12 & Basic
+    {w:'silhouette',d:'A dark outline seen against a lighter background.',s:'Her silhouette appeared in the doorway.'},
+    {w:'entrepreneur',d:'A person who starts and runs a business.',s:'The entrepreneur pitched her startup.'},
+    {w:'onomatopoeia',d:'A word that imitates the sound it describes.',s:'Buzz is an example of onomatopoeia.'},
+    {w:'archipelago',d:'A group or chain of islands.',s:'Indonesia is a vast archipelago.'},
+    {w:'accommodate',d:'To provide room for; to adapt to.',s:'The hotel can accommodate ten guests.'}
+  ],
+  expert:[ // Medium & Difficult
+    {w:'connoisseur',d:'An expert judge in matters of taste.',s:'He is a connoisseur of fine tea.'},
+    {w:'liaison',d:'A person who links two groups.',s:'She served as liaison between teams.'},
+    {w:'chiaroscuro',d:'The treatment of light and shade in art.',s:'The painting used dramatic chiaroscuro.'},
+    {w:'bourgeois',d:'Relating to the middle class.',s:'The novel satirized bourgeois life.'},
+    {w:'reconnaissance',d:'Military observation to gather information.',s:'The drone flew a reconnaissance mission.'}
+  ],
+  champ:[ // Champion
+    {w:'logorrhea',d:'Excessive and often incoherent talkativeness.',s:'His logorrhea exhausted the panel.'},
+    {w:'eudaemonic',d:'Producing happiness and well-being.',s:'She pursued a eudaemonic way of life.'},
+    {w:'scherenschnitte',d:'The art of decorative paper cutting.',s:'The museum displayed intricate scherenschnitte.'},
+    {w:'appoggiatura',d:'A grace note performed before a principal note.',s:'The aria opened with an appoggiatura.'},
+    {w:'psittacism',d:'Mechanical, repetitive speech without meaning.',s:'The lecture dissolved into psittacism.'}
+  ]
+};
+function poolFor(level){
+  const gi = LEVELS.indexOf(level);
+  if(gi<=3) return BANK.low; if(gi<=7) return BANK.mid;
+  if(gi<=12) return BANK.high; if(gi<=14) return BANK.expert; return BANK.champ;
+}
+const BOTS = [{n:'Krystal',a:'K'},{n:'Uche',a:'U'},{n:'Mara',a:'M'}];
+const ROUNDS = 5, TIME = 25;
+
+/* ------- state ------- */
+let state = {name:'Jen', level:'Grade 4', cat:'All Categories', round:0, words:[], scores:{}, timer:null, timeLeft:TIME, botAcc:.6, submitted:false};
+
+/* ------- helpers ------- */
+const $ = id=>document.getElementById(id);
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active');}
+function speak(word){
+  try{ speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(word); u.rate=.85; speechSynthesis.speak(u);
+  }catch(e){ $('hinttext').textContent = '(Audio unavailable here — the word starts with "'+word[0].toUpperCase()+'")'; }
+}
+function fakeCopy(btn){btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1200);}
+
+/* ------- signup ------- */
+$('f-email').addEventListener('input',e=>{
+  const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value);
+  $('email-hint').textContent = e.target.value ? (ok?'✓ Looks good':'Enter a valid email') : '';
+  $('email-hint').className = 'hint'+(ok?'':' err');
+});
+$('btn-signup').addEventListener('click',()=>{
+  const name=$('f-name').value.trim()||'Player';
+  const email=$('f-email').value.trim(); const pass=$('f-pass').value;
+  const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const passOk=pass.length>=8 && /[a-zA-Z]/.test(pass) && /\d/.test(pass);
+  if(!emailOk){$('email-hint').textContent='Enter a valid email'; $('email-hint').className='hint err'; return;}
+  if(!passOk){$('pass-hint').textContent='Password needs 8+ characters with at least one letter and one number.'; $('pass-hint').className='hint err'; return;}
+  state.name=name; $('lobby-hello').textContent=`New match, hosted by ${name}`;
+  buildLobby(); show('s-lobby');
+});
+
+/* ------- lobby ------- */
+function buildLobby(){
+  $('levels').innerHTML=''; $('cats').innerHTML='';
+  LEVELS.forEach(l=>{
+    const b=document.createElement('button'); b.className='chip'+(l===state.level?' sel':''); b.textContent=l;
+    b.onclick=()=>{state.level=l; [...$('levels').children].forEach(c=>c.classList.remove('sel')); b.classList.add('sel');};
+    $('levels').appendChild(b);
+  });
+  CATS.forEach(c=>{
+    const b=document.createElement('button'); b.className='chip coralsel'+(c===state.cat?' sel':''); b.textContent=c;
+    b.onclick=()=>{state.cat=c; [...$('cats').children].forEach(x=>x.classList.remove('sel')); b.classList.add('sel');};
+    $('cats').appendChild(b);
+  });
+  const pl=$('playerlist'); pl.innerHTML='';
+  addPlayer(state.name,state.name[0].toUpperCase(),true);
+  BOTS.forEach((b,i)=>setTimeout(()=>{ addPlayer(b.n,b.a,false);
+    if(i===BOTS.length-1){$('btn-start').disabled=false; $('btn-start').textContent='Everyone\'s ready — Start match';}
+  }, 900*(i+1)));
+}
+function addPlayer(n,a,you){
+  const d=document.createElement('div'); d.className='player'+(you?' you':'');
+  d.innerHTML=`<span class="avatar">${a}</span>${n}${you?' (you)':''}<span class="ready">✓ Ready</span>`;
+  $('playerlist').appendChild(d);
+}
+$('btn-start').addEventListener('click',()=>{
+  const gi=LEVELS.indexOf(state.level);
+  state.botAcc = gi<=7 ? .8 : gi<=12 ? .6 : gi<=14 ? .45 : .3;
+  state.words=[...poolFor(state.level)].sort(()=>Math.random()-.5).slice(0,ROUNDS);
+  state.scores={}; [state.name,...BOTS.map(b=>b.n)].forEach(n=>state.scores[n]=0);
+  state.round=0; startRound();
+});
+
+/* ------- game round ------- */
+function startRound(){
+  state.submitted=false; state.timeLeft=TIME; state.botDone={};
+  const w=state.words[state.round];
+  $('round-pill').textContent=`Round ${state.round+1} of ${ROUNDS}`;
+  $('level-pill').textContent=`${state.level} · ${state.cat.replace('All Categories','All')}`;
+  $('hinttext').textContent='Tap the speaker, then spell what you hear.';
+  $('f-spell').value=''; $('tiles').innerHTML='';
+  $('btn-submit').disabled=false;
+  renderOpps(); show('s-game');
+  setTimeout(()=>speak(w.w),400);
+  clearInterval(state.timer);
+  state.timer=setInterval(tick,1000); drawRing();
+  BOTS.forEach(b=>{ const t=3000+Math.random()*(TIME-8)*1000;
+    setTimeout(()=>{ if(state.round<ROUNDS && !state.botDone[b.n]){state.botDone[b.n]={t:TIME-state.timeLeft, ok:Math.random()<state.botAcc}; renderOpps();}},t);
+  });
+}
+function tick(){
+  state.timeLeft--; drawRing();
+  if(state.timeLeft<=0){clearInterval(state.timer); resolveRound(null,TIME);}
+}
+function drawRing(){
+  $('timer-num').textContent=state.timeLeft;
+  const frac=state.timeLeft/TIME;
+  $('ringfg').style.strokeDashoffset=301.6*(1-frac);
+  $('ringfg').style.stroke = frac<.25 ? 'var(--coral)' : 'var(--turq)';
+}
+function renderOpps(){
+  $('opp-status').innerHTML=BOTS.map(b=>`<span class="opp ${state.botDone&&state.botDone[b.n]?'done':''}">${b.n} ${state.botDone&&state.botDone[b.n]?'✓ submitted':'…spelling'}</span>`).join('');
+}
+$('f-spell').addEventListener('input',e=>{
+  $('tiles').innerHTML=[...e.target.value.trim()].map(ch=>`<span class="tile">${ch}</span>`).join('');
+});
+$('f-spell').addEventListener('keydown',e=>{if(e.key==='Enter')$('btn-submit').click();});
+$('btn-speak').addEventListener('click',()=>speak(state.words[state.round].w));
+$('btn-def').addEventListener('click',()=>{$('hinttext').textContent='Definition: '+state.words[state.round].d;});
+$('btn-sent').addEventListener('click',()=>{$('hinttext').textContent='“'+state.words[state.round].s+'”';});
+$('btn-submit').addEventListener('click',()=>{
+  if(state.submitted)return; state.submitted=true; $('btn-submit').disabled=true;
+  clearInterval(state.timer);
+  resolveRound($('f-spell').value.trim(), TIME-state.timeLeft);
+});
+
+/* ------- reveal ------- */
+function resolveRound(answer, myTime){
+  speechSynthesis.cancel();
+  const w=state.words[state.round];
+  const meOk = answer!==null && answer.toLowerCase()===w.w.toLowerCase();
+  const results=[{n:state.name, ok:meOk, t:myTime, sub:answer===null?'(no answer)':answer}];
+  BOTS.forEach(b=>{ const d=state.botDone[b.n]||{t:TIME,ok:false};
+    results.push({n:b.n, ok:d.ok, t:d.t, sub:d.ok?w.w:scramble(w.w)});
+  });
+  const correct=results.filter(r=>r.ok);
+  const fastest=correct.length?correct.reduce((a,b)=>a.t<b.t?a:b).n:null;
+  results.forEach(r=>{ r.pts=(r.ok?100:0)+(r.n===fastest?25:0); state.scores[r.n]+=r.pts; });
+  $('reveal-pill').textContent=`Round ${state.round+1} of ${ROUNDS}`;
+  $('reveal-lvl').textContent=state.level;
+  $('reveal-word').textContent=w.w;
+  $('reveal-verdict').textContent = meOk ? (state.name===fastest?'✓ Correct — fastest bee! +125':'✓ Correct! +100') : '✗ Not quite — 0 points';
+  $('reveal-verdict').className='verdict '+(meOk?'good':'bad');
+  $('reveal-scores').innerHTML = results.sort((a,b)=>state.scores[b.n]-state.scores[a.n]).map(r=>
+    `<div class="scorerow ${r.n===state.name?'me':''}"><span>${r.n}</span><span class="subm ${r.ok?'':'wrong'}">${r.sub}</span><span class="delta">+${r.pts}</span><span class="pts">${state.scores[r.n]}</span></div>`).join('');
+  $('btn-next').textContent = state.round+1>=ROUNDS ? 'See final results' : 'Next word';
+  show('s-reveal');
+}
+function scramble(w){ const a=[...w]; const i=1+Math.floor(Math.random()*(a.length-2)); [a[i],a[i+1]]=[a[i+1],a[i]]; return a.join(''); }
+$('btn-next').addEventListener('click',()=>{
+  state.round++;
+  if(state.round>=ROUNDS) showResults(); else startRound();
+});
+
+/* ------- results ------- */
+function showResults(){
+  const rows=Object.entries(state.scores).sort((a,b)=>b[1]-a[1]);
+  const winner=rows[0][0];
+  $('final-title').textContent = winner===state.name ? `You win, ${state.name}!` : `${winner} takes the hive!`;
+  $('final-sub').textContent = `${state.level} · ${state.cat} · ${ROUNDS} rounds`;
+  $('final-scores').innerHTML = rows.map(([n,p],i)=>
+    `<div class="scorerow ${i===0?'winner':''} ${n===state.name?'me':''}"><span>${i+1}. ${n}</span><span class="pts">${p} pts</span></div>`).join('');
+  show('s-results');
+}
+$('btn-rematch').addEventListener('click',()=>{$('btn-start').click();});
+$('btn-newmatch').addEventListener('click',()=>{buildLobby(); show('s-lobby');});
+</script>
+</body>
+</html>
