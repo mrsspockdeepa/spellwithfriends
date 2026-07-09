@@ -190,15 +190,12 @@
     <div class="logo" style="text-align:center;">Spell<span class="w">With</span><span class="f">Friends</span></div>
     <p class="tag" style="text-align:center;">A social app for spellers.</p>
     <h2>Create your account</h2>
-    <p class="sub">Three fields and you're in the hive.</p>
+    <p class="sub">Just your name and email — no password to remember.</p>
     <label for="f-name">Name</label>
     <input type="text" id="f-name" placeholder="Jen" autocomplete="name">
     <label for="f-email">Email</label>
     <input type="email" id="f-email" placeholder="you@example.com" autocomplete="email">
     <div class="hint" id="email-hint"></div>
-    <label for="f-pass">Password</label>
-    <input type="password" id="f-pass" placeholder="8+ characters, letters & numbers">
-    <div class="hint" id="pass-hint">Minimum 8 characters with at least one letter and one number.</div>
     <button class="btn" id="btn-signup">Sign up & play</button>
     <p class="hint" style="text-align:center; margin-top:12px;">Already buzzing? <a href="#" id="link-login" style="color:var(--turq-deep); font-weight:700;">Log in</a></p>
   </section>
@@ -207,31 +204,24 @@
   <section class="screen" id="s-login">
     <div class="logo" style="text-align:center; margin-top:10px;">Spell<span class="w">With</span><span class="f">Friends</span></div>
     <h2>Welcome back</h2>
-    <p class="sub">Log in to rejoin the hive.</p>
+    <p class="sub">Enter your email and we'll send you a magic link — no password needed.</p>
     <label for="f-lemail">Email</label>
     <input type="email" id="f-lemail" placeholder="you@example.com" autocomplete="email">
     <div class="hint" id="lemail-hint"></div>
-    <label for="f-lpass">Password</label>
-    <input type="password" id="f-lpass" placeholder="your password" autocomplete="current-password">
-    <button class="btn turq" id="btn-login">Log in</button>
-    <p class="hint" style="text-align:center; margin-top:14px;">
-      <a href="#" id="link-forgot" style="color:var(--coral-deep); font-weight:700;">Forgot password?</a>
-      &nbsp;·&nbsp;
-      <a href="#" id="link-signup" style="color:var(--turq-deep); font-weight:700;">Sign up</a>
-    </p>
+    <button class="btn turq" id="btn-login">Email me a magic link</button>
+    <p class="hint" style="text-align:center; margin-top:14px;">New here? <a href="#" id="link-signup" style="color:var(--turq-deep); font-weight:700;">Sign up</a></p>
   </section>
 
-  <!-- FORGOT PASSWORD -->
-  <section class="screen" id="s-forgot">
+  <!-- MAGIC LINK VERIFY -->
+  <section class="screen" id="s-verify">
     <div class="logo" style="text-align:center; margin-top:10px;">Spell<span class="w">With</span><span class="f">Friends</span></div>
-    <h2>Reset your password</h2>
-    <p class="sub">Enter your email and we'll send a reset link. Links expire after 30 minutes.</p>
-    <label for="f-remail">Email</label>
-    <input type="email" id="f-remail" placeholder="you@example.com" autocomplete="email">
-    <div class="hint" id="remail-hint"></div>
-    <button class="btn" id="btn-reset">Send reset link</button>
-    <div class="hint" id="reset-msg" style="text-align:center; margin-top:14px; font-size:14px;"></div>
-    <p class="hint" style="text-align:center; margin-top:10px;"><a href="#" id="link-backlogin" style="color:var(--turq-deep); font-weight:700;">Back to log in</a></p>
+    <div style="text-align:center; font-size:46px; margin-top:18px;">📬</div>
+    <h2 style="text-align:center;">Check your email</h2>
+    <p class="sub" style="text-align:center;" id="verify-sub"></p>
+    <button class="btn turq" id="btn-magic">✨ Open magic link (demo)</button>
+    <p class="hint" style="text-align:center; margin-top:14px;">Didn't get it? <a href="#" id="link-resend" style="color:var(--coral-deep); font-weight:700;">Resend</a>
+    &nbsp;·&nbsp; <a href="#" id="link-back" style="color:var(--turq-deep); font-weight:700;">Back</a></p>
+    <p class="hint" style="text-align:center; margin-top:6px;">Links expire after 15 minutes.</p>
   </section>
 
   <!-- LOBBY -->
@@ -380,9 +370,10 @@ function speak(word){
 }
 function fakeCopy(btn){btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1200);}
 
-/* ------- signup ------- */
+/* ------- passwordless auth ------- */
 const emailOkRe=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-let account=null; // {name,email} set at signup, used by login + reset flows
+let account=null;   // {name,email} created on first magic-link verification
+let pending=null;   // {name, email, mode:'signup'|'login'}
 $('f-email').addEventListener('input',e=>{
   const ok=emailOkRe.test(e.target.value);
   $('email-hint').textContent = e.target.value ? (ok?'✓ Looks good':'Enter a valid email') : '';
@@ -390,46 +381,43 @@ $('f-email').addEventListener('input',e=>{
 });
 $('btn-signup').addEventListener('click',()=>{
   const name=$('f-name').value.trim()||'Player';
-  const email=$('f-email').value.trim(); const pass=$('f-pass').value;
-  const passOk=pass.length>=8 && /[a-zA-Z]/.test(pass) && /\d/.test(pass);
+  const email=$('f-email').value.trim();
   if(!emailOkRe.test(email)){$('email-hint').textContent='Enter a valid email address (like you@example.com)'; $('email-hint').className='hint err'; $('f-email').focus(); return;}
-  if(!passOk){$('pass-hint').textContent='Password needs 8+ characters with at least one letter and one number.'; $('pass-hint').className='hint err'; $('f-pass').focus(); return;}
-  account={name,email};
-  state.name=name; $('lobby-hello').textContent=`New match, hosted by ${name}`;
-  buildLobby(); show('s-lobby');
+  pending={name,email,mode:'signup'};
+  $('verify-sub').textContent=`We sent a magic link to ${email}. Open it on this device and you're in.`;
+  show('s-verify');
 });
-
-/* ------- login / forgot password / logout ------- */
 $('link-login').addEventListener('click',e=>{e.preventDefault(); show('s-login');});
 $('link-signup').addEventListener('click',e=>{e.preventDefault(); show('s-signup');});
-$('link-forgot').addEventListener('click',e=>{e.preventDefault(); $('reset-msg').textContent=''; show('s-forgot');});
-$('link-backlogin').addEventListener('click',e=>{e.preventDefault(); show('s-login');});
 $('btn-login').addEventListener('click',()=>{
-  const email=$('f-lemail').value.trim(); const pass=$('f-lpass').value;
+  const email=$('f-lemail').value.trim();
   if(!emailOkRe.test(email)){$('lemail-hint').textContent='Enter a valid email address'; $('lemail-hint').className='hint err'; return;}
-  if(!pass){$('lemail-hint').textContent='Enter your password'; $('lemail-hint').className='hint err'; return;}
   if(account && account.email.toLowerCase()!==email.toLowerCase()){
     $('lemail-hint').textContent='No account found for that email — check the spelling or sign up.';
     $('lemail-hint').className='hint err'; return;
   }
   $('lemail-hint').textContent='';
   const name=account?account.name:email.split('@')[0].replace(/^./,c=>c.toUpperCase());
-  account=account||{name,email};
-  state.name=name; $('lobby-hello').textContent=`New match, hosted by ${name}`;
-  toast(`Welcome back, ${name}!`);
+  pending={name,email,mode:'login'};
+  $('verify-sub').textContent=`We sent a magic link to ${email}. Open it on this device and you're back in the hive.`;
+  show('s-verify');
+});
+$('btn-magic').addEventListener('click',()=>{
+  if(!pending) return;
+  if(pending.mode==='signup' || !account) account={name:pending.name, email:pending.email};
+  state.name=account.name;
+  $('lobby-hello').textContent=`New match, hosted by ${account.name}`;
+  toast(pending.mode==='signup' ? `Welcome to the hive, ${account.name}!` : `Welcome back, ${account.name}!`);
+  pending=null;
   buildLobby(); show('s-lobby');
 });
-$('btn-reset').addEventListener('click',()=>{
-  const email=$('f-remail').value.trim();
-  if(!emailOkRe.test(email)){$('remail-hint').textContent='Enter a valid email address'; $('remail-hint').className='hint err'; return;}
-  $('remail-hint').textContent='';
-  $('reset-msg').innerHTML='📬 If that email is registered, a reset link is on its way.<br>Check your inbox — the link expires in 30 minutes.';
-  toast('Reset link sent');
-});
+$('link-resend').addEventListener('click',e=>{e.preventDefault(); toast('Magic link re-sent 📬');});
+$('link-back').addEventListener('click',e=>{e.preventDefault(); show(pending&&pending.mode==='login'?'s-login':'s-signup');});
 $('btn-logout').addEventListener('click',()=>{
   clearInterval(state.timer);
   FRIENDS.forEach(f=>{f.joined=false; f.invited=false; if(f.n==='Uche')f.online=false;});
-  ['f-lemail','f-lpass','f-pass'].forEach(id=>$(id).value='');
+  ['f-email','f-lemail'].forEach(id=>$(id).value='');
+  pending=null;
   toast('Logged out — see you at the next bee 🐝');
   show('s-login');
 });
