@@ -116,6 +116,31 @@
   .wl.w{background:var(--turq);} .wl.l{background:var(--coral);}
   .histmeta{font-size:12px; color:var(--muted); font-weight:500;}
 
+  /* rare word splash */
+  #s-daily{position:relative; overflow:hidden; justify-content:center; text-align:center;
+    background:radial-gradient(500px 320px at 20% 15%, var(--turq-soft), transparent 70%),
+               radial-gradient(500px 320px at 85% 90%, var(--coral-soft), transparent 70%), #fff;}
+  .floatdot{position:absolute; border-radius:50%; opacity:.5; animation:drift 9s ease-in-out infinite alternate; pointer-events:none;}
+  @keyframes drift{from{transform:translate(0,0) scale(1);}to{transform:translate(14px,-26px) scale(1.25);}}
+  .daily-label{font-size:12px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--turq-deep); animation:fadeUp .5s ease both;}
+  .daily-word{font-family:'Bricolage Grotesque'; font-weight:800; font-size:40px; margin:14px 0 4px;
+    display:flex; justify-content:center; flex-wrap:wrap; gap:2px;}
+  .daily-word .L{display:inline-block; animation:letterpop .5s cubic-bezier(.2,1.6,.4,1) both;
+    background:linear-gradient(120deg, var(--coral) 0%, var(--turq-deep) 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+  @keyframes letterpop{from{opacity:0; transform:translateY(26px) scale(.4) rotate(-8deg);}to{opacity:1; transform:none;}}
+  .daily-def{font-size:16px; color:var(--ink); margin:14px 18px 0; line-height:1.5; animation:fadeUp .6s .9s ease both;}
+  .daily-sent{font-size:14px; color:var(--muted); font-style:italic; margin:12px 22px 0; line-height:1.5; animation:fadeUp .6s 1.3s ease both;}
+  .daily-speak{margin:18px auto 0; animation:fadeUp .6s 1.6s ease both;}
+  .daily-timer{position:absolute; left:0; right:0; bottom:0; height:6px; background:#EEF3F3;}
+  .daily-timer .fill{height:100%; width:100%; background:linear-gradient(90deg, var(--coral), var(--turq));
+    transform-origin:left; animation:shrink 20s linear forwards;}
+  @keyframes shrink{from{transform:scaleX(1);}to{transform:scaleX(0);}}
+  .daily-skip{position:absolute; top:14px; right:16px; background:rgba(255,255,255,.85); border:2px solid #E5EAEB;
+    border-radius:999px; padding:8px 16px; font-family:inherit; font-weight:700; font-size:13px; color:var(--muted); cursor:pointer;}
+  .daily-count{font-size:12px; color:var(--muted); font-weight:700; margin-top:16px; animation:fadeUp .6s 1.8s ease both;}
+
   /* game */
   .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
   .roundpill{background:var(--coral-soft); color:var(--coral-deep); font-weight:700; font-size:13px; padding:6px 12px; border-radius:999px;}
@@ -222,6 +247,18 @@
     <p class="hint" style="text-align:center; margin-top:14px;">Didn't get it? <a href="#" id="link-resend" style="color:var(--coral-deep); font-weight:700;">Resend</a>
     &nbsp;·&nbsp; <a href="#" id="link-back" style="color:var(--turq-deep); font-weight:700;">Back</a></p>
     <p class="hint" style="text-align:center; margin-top:6px;">Links expire after 15 minutes.</p>
+  </section>
+
+  <!-- RARE WORD SPLASH -->
+  <section class="screen" id="s-daily">
+    <button class="daily-skip" id="btn-skipdaily">Skip →</button>
+    <div class="daily-label">✨ Your rare word</div>
+    <div class="daily-word" id="daily-word"></div>
+    <p class="daily-def" id="daily-def"></p>
+    <p class="daily-sent" id="daily-sent"></p>
+    <button class="speak daily-speak" id="btn-dailyspeak">🔊 Hear it</button>
+    <div class="daily-count" id="daily-count">Off to the hive in 20s</div>
+    <div class="daily-timer"><div class="fill" id="daily-fill"></div></div>
   </section>
 
   <!-- LOBBY -->
@@ -409,7 +446,7 @@ $('btn-magic').addEventListener('click',()=>{
   $('lobby-hello').textContent=`New match, hosted by ${account.name}`;
   toast(pending.mode==='signup' ? `Welcome to the hive, ${account.name}!` : `Welcome back, ${account.name}!`);
   pending=null;
-  buildLobby(); show('s-lobby');
+  showDaily();
 });
 $('link-resend').addEventListener('click',e=>{e.preventDefault(); toast('Magic link re-sent 📬');});
 $('link-back').addEventListener('click',e=>{e.preventDefault(); show(pending&&pending.mode==='login'?'s-login':'s-signup');});
@@ -421,6 +458,59 @@ $('btn-logout').addEventListener('click',()=>{
   toast('Logged out — see you at the next bee 🐝');
   show('s-login');
 });
+
+/* ------- rare word splash ------- */
+const RARE = [
+  {w:'petrichor', d:'The pleasant, earthy smell that follows rain on dry ground.', s:'She flung the windows open to let in the petrichor.'},
+  {w:'apricity', d:'The warmth of the sun in winter.', s:'They lingered on the bench, savoring the apricity.'},
+  {w:'susurrus', d:'A soft whispering or rustling sound.', s:'A susurrus of leaves drifted through the grove.'},
+  {w:'mellifluous', d:'Sweet or musical; pleasant to hear.', s:'Her mellifluous voice calmed the whole room.'},
+  {w:'tintinnabulation', d:'The ringing or sounding of bells.', s:'The tintinnabulation carried across the valley.'},
+  {w:'sesquipedalian', d:'Given to using long words; polysyllabic.', s:'His sesquipedalian emails needed a dictionary.'},
+  {w:'halcyon', d:'Idyllically calm and peaceful; happy and golden.', s:'She reminisced about the halcyon days of summer.'},
+  {w:'borborygmus', d:'A rumbling sound made by the movement of gas in the intestines.', s:'A loud borborygmus interrupted the meeting.'}
+];
+let dailyT=null;
+async function pickRare(){
+  let seen=[];
+  try{ const r=await window.storage.get('rare-seen'); seen=JSON.parse(r.value)||[]; }catch(e){ /* first open or storage unavailable */ }
+  let avail=RARE.map((_,i)=>i).filter(i=>!seen.includes(i));
+  if(avail.length===0){ seen=[]; avail=RARE.map((_,i)=>i); } // full pool seen → reset (FR-7.4)
+  const i=avail[Math.floor(Math.random()*avail.length)];
+  seen.push(i);
+  try{ await window.storage.set('rare-seen', JSON.stringify(seen)); }catch(e){}
+  return i;
+}
+async function showDaily(){
+  const i=await pickRare(); const r=RARE[i];
+  $('daily-word').innerHTML=[...r.w].map((ch,k)=>`<span class="L" style="animation-delay:${.12*k}s">${ch}</span>`).join('');
+  $('daily-def').textContent=r.d;
+  $('daily-sent').textContent='“'+r.s+'”';
+  $('btn-dailyspeak').onclick=()=>speak(r.w);
+  // scatter fresh floating dots
+  document.querySelectorAll('.floatdot').forEach(d=>d.remove());
+  const palette=['#FF6B5E','#17BEBB','#FFC9C2','#9EE6E3'];
+  for(let k=0;k<14;k++){
+    const d=document.createElement('div'); d.className='floatdot';
+    const sz=6+Math.random()*22;
+    d.style.cssText=`width:${sz}px;height:${sz}px;background:${palette[k%4]};left:${Math.random()*92}%;top:${Math.random()*92}%;animation-delay:-${Math.random()*9}s;animation-duration:${7+Math.random()*6}s;`;
+    $('s-daily').appendChild(d);
+  }
+  // restart the 20s bar animation
+  const fill=$('daily-fill'); fill.style.animation='none'; void fill.offsetWidth; fill.style.animation='';
+  show('s-daily');
+  setTimeout(()=>speak(r.w), 700);
+  let left=20; $('daily-count').textContent='Off to the hive in 20s';
+  clearInterval(dailyT);
+  dailyT=setInterval(()=>{ left--;
+    if(left<=0){ endDaily(); } else { $('daily-count').textContent=`Off to the hive in ${left}s`; }
+  },1000);
+}
+function endDaily(){
+  clearInterval(dailyT); dailyT=null; speechSynthesis.cancel();
+  buildLobby(); show('s-lobby');
+}
+$('btn-skipdaily').addEventListener('click',endDaily);
 
 /* ------- lobby ------- */
 const HISTORY = [
@@ -543,7 +633,12 @@ $('f-spell').addEventListener('input',e=>{
 $('f-spell').addEventListener('keydown',e=>{if(e.key==='Enter')$('btn-submit').click();});
 $('btn-speak').addEventListener('click',()=>speak(state.words[state.round].w));
 $('btn-def').addEventListener('click',()=>{$('hinttext').textContent='Definition: '+state.words[state.round].d;});
-$('btn-sent').addEventListener('click',()=>{$('hinttext').textContent='“'+state.words[state.round].s+'”';});
+$('btn-sent').addEventListener('click',()=>{
+  const w=state.words[state.round];
+  const masked=w.s.replace(new RegExp(w.w,'ig'),'‸____‸');
+  $('hinttext').textContent='🔊 “'+masked+'”';
+  speak(w.s);
+});
 $('btn-submit').addEventListener('click',()=>{
   if(state.submitted)return; state.submitted=true; $('btn-submit').disabled=true;
   clearInterval(state.timer);
