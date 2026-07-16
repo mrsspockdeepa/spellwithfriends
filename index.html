@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SpellWithFriends — Interactive Prototype</title>
+<title>Spellionaire — Interactive Prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -188,11 +188,11 @@
 </head>
 <body>
 <div class="phone">
-  <div class="statusbar"><span></span><span>🐝 SpellWithFriends</span><span></span></div>
+  <div class="statusbar"><span></span><span>🐝 Spellionaire</span><span></span></div>
 
   <!-- SIGN UP -->
   <section class="screen active" id="s-signup">
-    <svg class="dotlogo" width="160" height="104" viewBox="0 0 150 100" role="img" aria-label="SpellWithFriends dot-art bee logo">
+    <svg class="dotlogo" width="160" height="104" viewBox="0 0 150 100" role="img" aria-label="Spellionaire dot-art bee logo">
       <path d="M10 92 Q 42 98 56 76" fill="none" stroke="#17BEBB" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 9"/>
       <g fill="#17BEBB">
         <circle cx="70" cy="20" r="5"/><circle cx="82" cy="14" r="6"/><circle cx="94" cy="19" r="5"/>
@@ -212,41 +212,16 @@
       <path d="M56 46 Q 56 36 62 31" fill="none" stroke="#22343B" stroke-width="2" stroke-linecap="round"/>
       <circle cx="62" cy="31" r="3" fill="#FF6B5E"/>
     </svg>
-    <div class="logo" style="text-align:center;">Spell<span class="w">With</span><span class="f">Friends</span></div>
+    <div class="logo" style="text-align:center;"><span class="w">Spell</span><span class="f">ionaire</span></div>
     <p class="tag" style="text-align:center;">A social app for spellers.</p>
-    <h2>Create your account</h2>
-    <p class="sub">Just your name and email — no password to remember.</p>
-    <label for="f-name">Name</label>
-    <input type="text" id="f-name" placeholder="Jen" autocomplete="name">
-    <label for="f-email">Email</label>
-    <input type="email" id="f-email" placeholder="you@example.com" autocomplete="email">
-    <div class="hint" id="email-hint"></div>
-    <button class="btn" id="btn-signup">Sign up & play</button>
-    <p class="hint" style="text-align:center; margin-top:12px;">Already buzzing? <a href="#" id="link-login" style="color:var(--turq-deep); font-weight:700;">Log in</a></p>
-  </section>
-
-  <!-- LOG IN -->
-  <section class="screen" id="s-login">
-    <div class="logo" style="text-align:center; margin-top:10px;">Spell<span class="w">With</span><span class="f">Friends</span></div>
-    <h2>Welcome back</h2>
-    <p class="sub">Enter your email and we'll send you a magic link — no password needed.</p>
-    <label for="f-lemail">Email</label>
-    <input type="email" id="f-lemail" placeholder="you@example.com" autocomplete="email">
-    <div class="hint" id="lemail-hint"></div>
-    <button class="btn turq" id="btn-login">Email me a magic link</button>
-    <p class="hint" style="text-align:center; margin-top:14px;">New here? <a href="#" id="link-signup" style="color:var(--turq-deep); font-weight:700;">Sign up</a></p>
-  </section>
-
-  <!-- MAGIC LINK VERIFY -->
-  <section class="screen" id="s-verify">
-    <div class="logo" style="text-align:center; margin-top:10px;">Spell<span class="w">With</span><span class="f">Friends</span></div>
-    <div style="text-align:center; font-size:46px; margin-top:18px;">📬</div>
-    <h2 style="text-align:center;">Check your email</h2>
-    <p class="sub" style="text-align:center;" id="verify-sub"></p>
-    <button class="btn turq" id="btn-magic">✨ Open magic link (demo)</button>
-    <p class="hint" style="text-align:center; margin-top:14px;">Didn't get it? <a href="#" id="link-resend" style="color:var(--coral-deep); font-weight:700;">Resend</a>
-    &nbsp;·&nbsp; <a href="#" id="link-back" style="color:var(--turq-deep); font-weight:700;">Back</a></p>
-    <p class="hint" style="text-align:center; margin-top:6px;">Links expire after 15 minutes.</p>
+    <h2>Jump right in</h2>
+    <p class="sub">No account, no password. Your first name, a unique username, and you're playing.</p>
+    <label for="f-first">First name</label>
+    <input type="text" id="f-first" placeholder="Jen" autocomplete="given-name">
+    <label for="f-user">Unique username</label>
+    <input type="text" id="f-user" placeholder="spelling.bee!jen" autocomplete="username" autocapitalize="off" spellcheck="false">
+    <div class="hint" id="user-hint">3–15 characters: letters, numbers, and . - ! # $ * ~</div>
+    <button class="btn" id="btn-start-play">Start playing & invite friends</button>
   </section>
 
   <!-- RARE WORD SPLASH -->
@@ -264,8 +239,8 @@
   <!-- LOBBY -->
   <section class="screen" id="s-lobby">
     <div style="display:flex; align-items:center; justify-content:space-between;">
-      <div class="logo" style="font-size:20px;">Spell<span class="w">With</span><span class="f">Friends</span></div>
-      <button class="hintbtn" id="btn-logout" style="color:var(--coral-deep); border-color:var(--coral-soft);">Log out</button>
+      <div class="logo" style="font-size:20px;"><span class="w">Spell</span><span class="f">ionaire</span></div>
+      <button class="hintbtn" id="btn-switch" style="color:var(--coral-deep); border-color:var(--coral-soft);">Switch player</button>
     </div>
     <h2 id="lobby-hello">New match</h2>
     <p class="sub">You're the host. Pick a level and category, then wait for the swarm.</p>
@@ -374,18 +349,39 @@ const BANK = {
     {w:'bourgeois',d:'Relating to the middle class.',s:'The novel satirized bourgeois life.'},
     {w:'reconnaissance',d:'Military observation to gather information.',s:'The drone flew a reconnaissance mission.'}
   ],
-  champ:[ // Champion
-    {w:'logorrhea',d:'Excessive and often incoherent talkativeness.',s:'His logorrhea exhausted the panel.'},
-    {w:'eudaemonic',d:'Producing happiness and well-being.',s:'She pursued a eudaemonic way of life.'},
+  champ:[ // Champion — words from past Scripps National Spelling Bee competitions (publicly reported)
     {w:'scherenschnitte',d:'The art of decorative paper cutting.',s:'The museum displayed intricate scherenschnitte.'},
-    {w:'appoggiatura',d:'A grace note performed before a principal note.',s:'The aria opened with an appoggiatura.'},
-    {w:'psittacism',d:'Mechanical, repetitive speech without meaning.',s:'The lecture dissolved into psittacism.'}
+    {w:'knaidel',d:'A small round dumpling, such as a matzo ball.',s:'She ladled a knaidel into each bowl of soup.'},
+    {w:'koinonia',d:'Intimate spiritual communion and fellowship.',s:'The congregation cherished its sense of koinonia.'},
+    {w:'murraya',d:'A genus of tropical Asiatic trees of the citrus family.',s:'The murraya hedge bloomed with fragrant white flowers.'},
+    {w:'moorhen',d:'A common water bird related to the rails and coots.',s:'A moorhen paddled quietly across the pond.'},
+    {w:'psammophile',d:'An organism that thrives in sandy soil.',s:'The desert lizard is a classic psammophile.'},
+    {w:'abseil',d:'To descend a steep rock face using a doubled rope.',s:'The climbers had to abseil down the cliff at dusk.'}
   ]
 };
 function poolFor(level){
   const gi = LEVELS.indexOf(level);
   if(gi<=3) return BANK.low; if(gi<=7) return BANK.mid;
   if(gi<=12) return BANK.high; if(gi<=14) return BANK.expert; return BANK.champ;
+}
+function poolKey(level){
+  const gi = LEVELS.indexOf(level);
+  return gi<=3?'low':gi<=7?'mid':gi<=12?'high':gi<=14?'expert':'champ';
+}
+// FR-3.11: no word repeats at a level until the whole level pool has been served
+async function pickMatchWords(level, count){
+  const pool=poolFor(level), key='served-'+poolKey(level);
+  let served=[];
+  try{ const r=await window.storage.get(key); served=JSON.parse(r.value)||[]; }catch(e){}
+  let unseen=pool.filter(w=>!served.includes(w.w));
+  const picks=[];
+  while(picks.length<count){
+    if(unseen.length===0){ served=[]; unseen=pool.filter(w=>!picks.some(p=>p.w===w.w)); } // pool exhausted → reset
+    const i=Math.floor(Math.random()*unseen.length);
+    picks.push(unseen[i]); served.push(unseen[i].w); unseen.splice(i,1);
+  }
+  try{ await window.storage.set(key, JSON.stringify(served)); }catch(e){}
+  return picks;
 }
 const FRIENDS = [
   {n:'Krystal', a:'K', online:true,  joined:false, invited:false},
@@ -407,56 +403,36 @@ function speak(word){
 }
 function fakeCopy(btn){btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1200);}
 
-/* ------- passwordless auth ------- */
-const emailOkRe=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-let account=null;   // {name,email} created on first magic-link verification
-let pending=null;   // {name, email, mode:'signup'|'login'}
-$('f-email').addEventListener('input',e=>{
-  const ok=emailOkRe.test(e.target.value);
-  $('email-hint').textContent = e.target.value ? (ok?'✓ Looks good':'Enter a valid email') : '';
-  $('email-hint').className = 'hint'+(ok?'':' err');
+/* ------- frictionless entry (no accounts) ------- */
+const USER_RE=/^[a-zA-Z0-9.!#$*~-]{3,15}$/;
+const TAKEN=['spellionaire','beequeen','wordwasp','krystal.k','uche','admin'];
+let player=null; // {first, user} — device-bound, no account
+$('f-user').addEventListener('input',e=>{
+  const u=e.target.value.trim().toLowerCase();
+  if(!u){$('user-hint').textContent='3–15 characters: letters, numbers, and . - ! # $ * ~'; $('user-hint').className='hint'; return;}
+  if(!USER_RE.test(u)){$('user-hint').textContent='3–15 characters: letters, numbers, and . - ! # $ * ~ only (no spaces).'; $('user-hint').className='hint err'; return;}
+  if(TAKEN.includes(u)){$('user-hint').textContent=`✗ "${u}" is taken — try ${u}.bee or ${u}${Math.floor(Math.random()*90+10)}`; $('user-hint').className='hint err'; return;}
+  $('user-hint').textContent='✓ Available'; $('user-hint').className='hint';
 });
-$('btn-signup').addEventListener('click',()=>{
-  const name=$('f-name').value.trim()||'Player';
-  const email=$('f-email').value.trim();
-  if(!emailOkRe.test(email)){$('email-hint').textContent='Enter a valid email address (like you@example.com)'; $('email-hint').className='hint err'; $('f-email').focus(); return;}
-  pending={name,email,mode:'signup'};
-  $('verify-sub').textContent=`We sent a magic link to ${email}. Open it on this device and you're in.`;
-  show('s-verify');
-});
-$('link-login').addEventListener('click',e=>{e.preventDefault(); show('s-login');});
-$('link-signup').addEventListener('click',e=>{e.preventDefault(); show('s-signup');});
-$('btn-login').addEventListener('click',()=>{
-  const email=$('f-lemail').value.trim();
-  if(!emailOkRe.test(email)){$('lemail-hint').textContent='Enter a valid email address'; $('lemail-hint').className='hint err'; return;}
-  if(account && account.email.toLowerCase()!==email.toLowerCase()){
-    $('lemail-hint').textContent='No account found for that email — check the spelling or sign up.';
-    $('lemail-hint').className='hint err'; return;
-  }
-  $('lemail-hint').textContent='';
-  const name=account?account.name:email.split('@')[0].replace(/^./,c=>c.toUpperCase());
-  pending={name,email,mode:'login'};
-  $('verify-sub').textContent=`We sent a magic link to ${email}. Open it on this device and you're back in the hive.`;
-  show('s-verify');
-});
-$('btn-magic').addEventListener('click',()=>{
-  if(!pending) return;
-  if(pending.mode==='signup' || !account) account={name:pending.name, email:pending.email};
-  state.name=account.name;
-  $('lobby-hello').textContent=`New match, hosted by ${account.name}`;
-  toast(pending.mode==='signup' ? `Welcome to the hive, ${account.name}!` : `Welcome back, ${account.name}!`);
-  pending=null;
+$('btn-start-play').addEventListener('click',()=>{
+  const first=$('f-first').value.trim()||'Player';
+  const u=$('f-user').value.trim(); const ul=u.toLowerCase();
+  if(!USER_RE.test(ul)){$('user-hint').textContent='3–15 characters: letters, numbers, and . - ! # $ * ~ only (no spaces).'; $('user-hint').className='hint err'; $('f-user').focus(); return;}
+  if(TAKEN.includes(ul)){$('user-hint').textContent=`✗ "${ul}" is taken — pick another.`; $('user-hint').className='hint err'; $('f-user').focus(); return;}
+  player={first,user:u};
+  state.name=u;
+  $('lobby-hello').textContent=`New match, hosted by ${u}`;
+  toast(`Welcome, ${first}! You're in — invite your friends 🐝`);
   showDaily();
 });
-$('link-resend').addEventListener('click',e=>{e.preventDefault(); toast('Magic link re-sent 📬');});
-$('link-back').addEventListener('click',e=>{e.preventDefault(); show(pending&&pending.mode==='login'?'s-login':'s-signup');});
-$('btn-logout').addEventListener('click',()=>{
+$('btn-switch').addEventListener('click',()=>{
   clearInterval(state.timer);
   FRIENDS.forEach(f=>{f.joined=false; f.invited=false; if(f.n==='Uche')f.online=false;});
-  ['f-email','f-lemail'].forEach(id=>$(id).value='');
-  pending=null;
-  toast('Logged out — see you at the next bee 🐝');
-  show('s-login');
+  ['f-first','f-user'].forEach(id=>$(id).value='');
+  $('user-hint').textContent='3–15 characters: letters, numbers, and . - ! # $ * ~'; $('user-hint').className='hint';
+  player=null;
+  toast('See you at the next bee 🐝');
+  show('s-signup');
 });
 
 /* ------- rare word splash ------- */
@@ -588,11 +564,11 @@ function updateStart(){
   $('btn-start').disabled = joined<1;
   $('btn-start').textContent = joined>=1 ? `Start match (${joined+1} players)` : 'Waiting for players…';
 }
-$('btn-start').addEventListener('click',()=>{
+$('btn-start').addEventListener('click',async ()=>{
   const gi=LEVELS.indexOf(state.level);
   state.botAcc = gi<=7 ? .8 : gi<=12 ? .6 : gi<=14 ? .45 : .3;
   state.opponents=FRIENDS.filter(f=>f.joined);
-  state.words=[...poolFor(state.level)].sort(()=>Math.random()-.5).slice(0,ROUNDS);
+  state.words=await pickMatchWords(state.level, ROUNDS);
   state.scores={}; [state.name,...state.opponents.map(b=>b.n)].forEach(n=>state.scores[n]=0);
   state.round=0; startRound();
 });
